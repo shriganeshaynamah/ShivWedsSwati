@@ -1,0 +1,53 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --font-serif: "Playfair Display", serif;
+  --font-sans: "Inter", sans-serif;
+  
+  --color-wedding-gold: #D4AF37;
+  --color-wedding-red: #8B0000;
+  --color-wedding-cream: #FFFDD0;
+  --color-wedding-saffron: #F4C430;
+}
+
+@layer base {
+  body {
+    @apply bg-wedding-cream text-stone-900 font-sans;
+  }
+  
+  h1, h2, h3, h4 {
+    @apply font-serif;
+  }
+}
+
+.mandala-bg {
+  background-image: url("https://www.transparenttextures.com/patterns/mandala.png");
+  opacity: 0.1;
+}
+
+.gold-gradient {
+  background: linear-gradient(45deg, #BF953F, #FCF6BA, #B38728, #FBF5B7, #AA771C);
+}
+
+.text-gold {
+  background: linear-gradient(45deg, #BF953F, #B38728, #AA771C);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+@keyframes marquee {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+.animate-marquee {
+  display: flex;
+  white-space: nowrap;
+  animation: marquee 30s linear infinite;
+  width: max-content;
+}
+
+.mantra-box {
+  @apply fixed top-16 left-0 w-full bg-wedding-gold text-wedding-red py-1 z-40 shadow-sm overflow-hidden font-serif font-bold text-sm md:text-base;
+}

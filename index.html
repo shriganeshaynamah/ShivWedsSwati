@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="hi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script>
+      // AI Studio environment constraint: HMR is disabled, ignore WebSocket errors.
+      window.addEventListener('unhandledrejection', function(event) {
+        var reason = event && event.reason;
+        var msg = (reason && (reason.message || reason.stack || String(reason))) || '';
+        if (
+          msg.includes('WebSocket') || 
+          msg.includes('vite:ws') || 
+          msg.includes('@vite/client') ||
+          msg.includes('closed without opened')
+        ) {
+          event.preventDefault();
+          event.stopImmediatePropagation();
+        }
+      }, true);
+
+      window.addEventListener('error', function(event) {
+        var msg = ((event && event.message) || '') + ' ' + ((event && event.filename) || '');
+        if (
+          msg.includes('WebSocket') || 
+          msg.includes('@vite/client') ||
+          msg.includes('closed without opened')
+        ) {
+          event.preventDefault();
+          event.stopImmediatePropagation();
+        }
+      }, true);
+    </script>
+    <title>Shiv & Shwati Wedding Invitation</title>
+    <meta name="description" content="A beautiful Indian wedding invitation and guest book for Dr. Shiv Shankar and Dr. Shwati." />
+    
+    <!-- Open Graph / Social Media -->
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Shiv & Shwati Wedding Invitation" />
+    <meta property="og:description" content="A beautiful Indian wedding invitation and guest book for Dr. Shiv Shankar and Dr. Shwati." />
+    <meta property="og:image" content="https://lh3.googleusercontent.com/d/1YqrB3fokOc1baaywTmZp8sRG-bcYDCLq" />
+
+    <!-- Favicon & Resource hints -->
+    <link rel="icon" type="image/png" href="https://lh3.googleusercontent.com/d/1YqrB3fokOc1baaywTmZp8sRG-bcYDCLq" />
+    <link rel="preconnect" href="https://lh3.googleusercontent.com" crossorigin />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
