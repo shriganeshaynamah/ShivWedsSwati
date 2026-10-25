@@ -7,31 +7,14 @@ import {
   LogOut, Sparkles, CheckCircle2, ShieldCheck, Loader2
 } from 'lucide-react';
 
-export interface GitHubUser {
-  id: number | string;
-  login: string;
-  name: string;
-  avatar_url: string;
-  bio?: string;
-  html_url: string;
-  email?: string;
-}
-
 export interface GuestBookEntry {
   id: string;
   name: string;
-  handle?: string;
+  relation?: string;
   avatarUrl?: string;
   message: string;
   createdAt: string;
-  isGitHubVerified?: boolean;
 }
-
-const GitHubIcon = ({ className = "w-4 h-4" }: { className?: string }) => (
-  <svg className={className} viewBox="0 0 24 24" fill="currentColor">
-    <path fillRule="evenodd" clipRule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" />
-  </svg>
-);
 
 // --- Components ---
 
@@ -39,23 +22,12 @@ const Navbar = ({
   onOpenGuestBook, 
   lang, 
   setLang,
-  user,
-  onSignInWithGitHub,
-  onSignOut,
-  onOpenOAuthGuide,
-  authLoading
 }: { 
   onOpenGuestBook: () => void; 
   lang: 'en' | 'hi'; 
   setLang: (l: 'en' | 'hi') => void;
-  user: GitHubUser | null;
-  onSignInWithGitHub: () => void;
-  onSignOut: () => void;
-  onOpenOAuthGuide: () => void;
-  authLoading: boolean;
 }) => {
   const [isOpen, setIsOpen] = useState(false);
-  const [showUserDropdown, setShowUserDropdown] = useState(false);
 
   const menuItems = [
     { name: lang === 'en' ? 'Home' : 'होम', href: '#home' },
@@ -92,90 +64,13 @@ const Navbar = ({
               >
                 {lang === 'en' ? 'HINDI' : 'ENGLISH'}
               </button>
-              
-              {/* GitHub Auth Section */}
-              {user ? (
-                <div className="relative">
-                  <button
-                    onClick={() => setShowUserDropdown(!showUserDropdown)}
-                    className="flex items-center gap-2 bg-stone-900/80 hover:bg-stone-900 border border-wedding-gold/40 px-3 py-1.5 rounded-full text-xs transition-all cursor-pointer text-stone-100"
-                  >
-                    <img 
-                      src={user.avatar_url} 
-                      alt={user.login} 
-                      className="w-6 h-6 rounded-full border border-wedding-gold"
-                    />
-                    <span className="font-semibold max-w-[100px] truncate">@{user.login}</span>
-                    <ChevronDown size={14} className="text-wedding-gold" />
-                  </button>
-
-                  <AnimatePresence>
-                    {showUserDropdown && (
-                      <motion.div
-                        initial={{ opacity: 0, y: 10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: 10 }}
-                        className="absolute right-0 mt-2 w-56 bg-stone-900 text-stone-100 rounded-2xl shadow-2xl border border-wedding-gold/30 p-2 z-50 text-xs"
-                      >
-                        <div className="px-3 py-2 border-b border-stone-800">
-                          <p className="font-bold text-wedding-gold truncate">{user.name || user.login}</p>
-                          <p className="text-stone-400 text-[11px] truncate">@{user.login}</p>
-                        </div>
-                        <a
-                          href={user.html_url}
-                          target="_blank"
-                          rel="noreferrer"
-                          className="flex items-center gap-2 px-3 py-2 hover:bg-stone-800 rounded-lg transition-colors mt-1"
-                        >
-                          <GitHubIcon className="w-4 h-4 text-wedding-gold" />
-                          <span>{lang === 'en' ? 'GitHub Profile' : 'गिटहब प्रोफाइल'}</span>
-                          <ExternalLink size={12} className="ml-auto opacity-60" />
-                        </a>
-                        <button
-                          onClick={() => {
-                            setShowUserDropdown(false);
-                            onOpenGuestBook();
-                          }}
-                          className="w-full flex items-center gap-2 px-3 py-2 hover:bg-stone-800 rounded-lg transition-colors text-left"
-                        >
-                          <Heart size={14} className="text-rose-400" />
-                          <span>{lang === 'en' ? 'Sign Guest Book' : 'अतिथि पुस्तिका साइन करें'}</span>
-                        </button>
-                        <button
-                          onClick={() => {
-                            setShowUserDropdown(false);
-                            onSignOut();
-                          }}
-                          className="w-full flex items-center gap-2 px-3 py-2 hover:bg-red-950/60 text-red-400 rounded-lg transition-colors text-left border-t border-stone-800 mt-1 cursor-pointer"
-                        >
-                          <LogOut size={14} />
-                          <span>{lang === 'en' ? 'Sign Out' : 'साइन आउट'}</span>
-                        </button>
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
-                </div>
-              ) : (
-                <button
-                  onClick={onSignInWithGitHub}
-                  disabled={authLoading}
-                  className="flex items-center gap-2 bg-stone-950 hover:bg-black text-wedding-cream px-3.5 py-1.5 rounded-full text-xs font-semibold border border-wedding-gold/50 hover:border-wedding-gold transition-all shadow-md cursor-pointer disabled:opacity-50"
-                  title="Sign in with GitHub"
-                >
-                  {authLoading ? (
-                    <Loader2 size={14} className="animate-spin text-wedding-gold" />
-                  ) : (
-                    <GitHubIcon className="w-4 h-4 text-white" />
-                  )}
-                  <span>{lang === 'en' ? 'Sign in with GitHub' : 'गिटहब से साइन इन'}</span>
-                </button>
-              )}
 
               <button 
                 onClick={onOpenGuestBook}
-                className="bg-wedding-gold text-wedding-red px-4 py-2 rounded-full font-bold hover:bg-wedding-saffron transition-all text-sm cursor-pointer shadow-md"
+                className="bg-wedding-gold text-wedding-red px-5 py-2 rounded-full font-bold hover:bg-wedding-saffron transition-all text-sm cursor-pointer shadow-md flex items-center gap-2"
               >
-                {lang === 'en' ? 'Guest Book' : 'अतिथि पुस्तिका'}
+                <Heart size={15} className="fill-wedding-red" />
+                <span>{lang === 'en' ? 'Guest Book' : 'अतिथि पुस्तिका'}</span>
               </button>
             </div>
 
@@ -215,46 +110,12 @@ const Navbar = ({
                   </a>
                 ))}
 
-                {/* Mobile GitHub Auth Item */}
-                <div className="p-2 border-b border-wedding-gold/10">
-                  {user ? (
-                    <div className="bg-stone-900/90 rounded-2xl p-3 text-center space-y-2 border border-wedding-gold/30">
-                      <div className="flex items-center justify-center gap-3">
-                        <img src={user.avatar_url} alt={user.login} className="w-8 h-8 rounded-full border border-wedding-gold" />
-                        <div className="text-left">
-                          <p className="font-bold text-sm text-wedding-gold">{user.name || user.login}</p>
-                          <p className="text-xs text-stone-400">@{user.login}</p>
-                        </div>
-                      </div>
-                      <button
-                        onClick={() => {
-                          setIsOpen(false);
-                          onSignOut();
-                        }}
-                        className="w-full text-xs text-red-400 py-1.5 rounded-lg border border-red-500/30 hover:bg-red-950/40"
-                      >
-                        {lang === 'en' ? 'Sign Out' : 'साइन आउट'}
-                      </button>
-                    </div>
-                  ) : (
-                    <button
-                      onClick={() => {
-                        setIsOpen(false);
-                        onSignInWithGitHub();
-                      }}
-                      className="w-full flex items-center justify-center gap-2 bg-stone-950 hover:bg-black text-wedding-cream py-3 rounded-xl font-medium border border-wedding-gold/40 text-sm"
-                    >
-                      <GitHubIcon className="w-4 h-4 text-white" />
-                      <span>{lang === 'en' ? 'Sign in with GitHub' : 'गिटहब से साइन इन करें'}</span>
-                    </button>
-                  )}
-                </div>
-
                 <button 
                   onClick={() => { onOpenGuestBook(); setIsOpen(false); }}
-                  className="w-full py-3 text-wedding-saffron font-bold text-center border-b border-wedding-gold/10"
+                  className="w-full py-3 text-wedding-saffron font-bold text-center border-b border-wedding-gold/10 flex items-center justify-center gap-2"
                 >
-                  {lang === 'en' ? 'Guest Book' : 'अतिथि पुस्तिका'}
+                  <Heart size={16} className="fill-wedding-saffron" />
+                  <span>{lang === 'en' ? 'Guest Book' : 'अतिथि पुस्तिका'}</span>
                 </button>
                 <a 
                   href="https://wa.me/917665607016?text=Congratulations%20Shiv%20and%20Shwati!%20🎉"
@@ -569,218 +430,20 @@ const Contact = ({ lang }: { lang: 'en' | 'hi' }) => {
   );
 };
 
-const OAuthSetupModal = ({
-  isOpen,
-  onClose,
-  lang,
-  onDemoLogin
-}: {
-  isOpen: boolean;
-  onClose: () => void;
-  lang: 'en' | 'hi';
-  onDemoLogin: () => void;
-}) => {
-  const [copiedDev, setCopiedDev] = useState(false);
-  const [copiedProd, setCopiedProd] = useState(false);
-
-  const devUrl = 'https://ais-dev-bqh3ep774ncse22iyjynnm-231831413221.asia-east1.run.app/auth/callback';
-  const prodUrl = 'https://ais-pre-bqh3ep774ncse22iyjynnm-231831413221.asia-east1.run.app/auth/callback';
-
-  const copyToClipboard = (text: string, isDev: boolean) => {
-    navigator.clipboard.writeText(text);
-    if (isDev) {
-      setCopiedDev(true);
-      setTimeout(() => setCopiedDev(false), 2000);
-    } else {
-      setCopiedProd(true);
-      setTimeout(() => setCopiedProd(false), 2000);
-    }
-  };
-
-  return (
-    <AnimatePresence>
-      {isOpen && (
-        <div className="fixed inset-0 z-[150] flex items-center justify-center p-4">
-          <motion.div 
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            onClick={onClose}
-            className="absolute inset-0 bg-black/75 backdrop-blur-sm"
-          />
-          <motion.div 
-            initial={{ scale: 0.95, opacity: 0, y: 15 }}
-            animate={{ scale: 1, opacity: 1, y: 0 }}
-            exit={{ scale: 0.95, opacity: 0, y: 15 }}
-            className="relative bg-stone-900 text-stone-100 w-full max-w-2xl rounded-3xl shadow-2xl overflow-hidden border border-wedding-gold/40 max-h-[90vh] flex flex-col"
-          >
-            {/* Modal Header */}
-            <div className="bg-stone-950 px-6 py-4 border-b border-stone-800 flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <div className="p-2 bg-wedding-red/40 rounded-xl text-wedding-gold border border-wedding-gold/30">
-                  <GitHubIcon className="w-5 h-5 text-wedding-gold" />
-                </div>
-                <div>
-                  <h3 className="text-lg font-bold text-wedding-cream">
-                    {lang === 'en' ? 'GitHub OAuth Setup Guide' : 'गिटहब ऑथेंटिकेशन सेटअप गाइड'}
-                  </h3>
-                  <p className="text-xs text-stone-400">
-                    {lang === 'en' ? 'Follow these steps to connect your GitHub OAuth App' : 'गिटहब ऐप से कनेक्ट करने के निर्देश'}
-                  </p>
-                </div>
-              </div>
-              <button 
-                onClick={onClose} 
-                className="p-1.5 hover:bg-stone-800 text-stone-400 hover:text-white rounded-full transition-colors cursor-pointer"
-              >
-                <X size={20} />
-              </button>
-            </div>
-
-            {/* Modal Body */}
-            <div className="p-6 overflow-y-auto space-y-6 text-sm">
-              <div className="bg-amber-500/10 border border-amber-500/30 rounded-2xl p-4 flex items-start gap-3">
-                <AlertCircle className="w-5 h-5 text-amber-400 shrink-0 mt-0.5" />
-                <div className="text-xs leading-relaxed text-amber-200">
-                  <p className="font-semibold text-amber-300 mb-1">
-                    {lang === 'en' ? 'Why am I seeing this?' : 'यह स्क्रीन क्यों दिख रही है?'}
-                  </p>
-                  <p>
-                    {lang === 'en' 
-                      ? 'To sign in with your real GitHub account, GitHub requires registering this application in your GitHub Developer settings with the exact callback URLs shown below.'
-                      : 'असली गिटहब अकाउंट से साइन इन करने के लिए, गिटहब डेवलपर सेटिंग्स में ऐप रजिस्टर करना आवश्यक है।'}
-                  </p>
-                </div>
-              </div>
-
-              {/* Exact Callback URLs Section */}
-              <div className="space-y-4">
-                <h4 className="font-semibold text-wedding-gold text-xs uppercase tracking-wider">
-                  {lang === 'en' ? '1. Add These Authorization Callback URLs in GitHub:' : '1. गिटहब सेटिंग्स में यह कॉलबैक यूआरएल दर्ज करें:'}
-                </h4>
-
-                {/* Development URL */}
-                <div className="bg-stone-950 p-3.5 rounded-xl border border-stone-800 space-y-1.5">
-                  <div className="flex justify-between items-center text-xs">
-                    <span className="text-stone-400 font-medium">Development Callback URL:</span>
-                    <button
-                      onClick={() => copyToClipboard(devUrl, true)}
-                      className="flex items-center gap-1.5 text-[11px] text-wedding-gold hover:text-wedding-saffron bg-wedding-gold/10 px-2.5 py-1 rounded-md transition-colors cursor-pointer"
-                    >
-                      {copiedDev ? <Check size={12} className="text-green-400" /> : <Copy size={12} />}
-                      <span>{copiedDev ? 'Copied!' : 'Copy'}</span>
-                    </button>
-                  </div>
-                  <code className="block text-xs font-mono text-stone-200 break-all select-all bg-stone-900/80 p-2 rounded border border-stone-800">
-                    {devUrl}
-                  </code>
-                </div>
-
-                {/* Shared URL */}
-                <div className="bg-stone-950 p-3.5 rounded-xl border border-stone-800 space-y-1.5">
-                  <div className="flex justify-between items-center text-xs">
-                    <span className="text-stone-400 font-medium">Shared / Deployed Callback URL:</span>
-                    <button
-                      onClick={() => copyToClipboard(prodUrl, false)}
-                      className="flex items-center gap-1.5 text-[11px] text-wedding-gold hover:text-wedding-saffron bg-wedding-gold/10 px-2.5 py-1 rounded-md transition-colors cursor-pointer"
-                    >
-                      {copiedProd ? <Check size={12} className="text-green-400" /> : <Copy size={12} />}
-                      <span>{copiedProd ? 'Copied!' : 'Copy'}</span>
-                    </button>
-                  </div>
-                  <code className="block text-xs font-mono text-stone-200 break-all select-all bg-stone-900/80 p-2 rounded border border-stone-800">
-                    {prodUrl}
-                  </code>
-                </div>
-              </div>
-
-              {/* Steps */}
-              <div className="space-y-3">
-                <h4 className="font-semibold text-wedding-gold text-xs uppercase tracking-wider">
-                  {lang === 'en' ? '2. Setup Steps in GitHub:' : '2. गिटहब में सेटअप के चरण:'}
-                </h4>
-                <ol className="list-decimal list-inside space-y-2 text-xs text-stone-300">
-                  <li className="leading-relaxed">
-                    Open{' '}
-                    <a 
-                      href="https://github.com/settings/developers" 
-                      target="_blank" 
-                      rel="noreferrer" 
-                      className="text-wedding-gold underline hover:text-wedding-saffron inline-flex items-center gap-1 font-semibold"
-                    >
-                      GitHub Developer Settings <ExternalLink size={11} />
-                    </a>
-                    {' '}and click <strong className="text-white">"New OAuth App"</strong>.
-                  </li>
-                  <li className="leading-relaxed">
-                    Set Application name to <strong className="text-white">Shiv & Shwati Wedding</strong>.
-                  </li>
-                  <li className="leading-relaxed">
-                    Set Homepage URL to <code className="text-wedding-gold bg-stone-800 px-1 py-0.5 rounded">https://ais-dev-bqh3ep774ncse22iyjynnm-231831413221.asia-east1.run.app</code>
-                  </li>
-                  <li className="leading-relaxed">
-                    Paste the copied <strong className="text-white">Authorization callback URL</strong> from above.
-                  </li>
-                  <li className="leading-relaxed">
-                    Click <strong className="text-white">Register application</strong>, generate a Client Secret, and set these environment variables in your app secrets:
-                    <div className="mt-2 bg-stone-950 p-3 rounded-lg border border-stone-800 font-mono text-[11px] text-stone-300 space-y-1">
-                      <div>GITHUB_CLIENT_ID=&quot;your_client_id&quot;</div>
-                      <div>GITHUB_CLIENT_SECRET=&quot;your_client_secret&quot;</div>
-                    </div>
-                  </li>
-                </ol>
-              </div>
-
-              {/* Instant Test Mode */}
-              <div className="pt-2 border-t border-stone-800 flex flex-col sm:flex-row items-center justify-between gap-4">
-                <div className="text-xs text-stone-400">
-                  <p className="font-medium text-stone-300">Want to test the guest book immediately?</p>
-                  <p>You can preview the full experience with a simulated GitHub login.</p>
-                </div>
-                <button
-                  onClick={() => {
-                    onDemoLogin();
-                    onClose();
-                  }}
-                  className="w-full sm:w-auto shrink-0 flex items-center justify-center gap-2 bg-wedding-gold text-wedding-red px-5 py-2.5 rounded-xl font-bold hover:bg-wedding-saffron transition-all text-xs cursor-pointer shadow-lg"
-                >
-                  <Sparkles size={14} />
-                  <span>{lang === 'en' ? 'Quick Test Sign-In' : 'तुरंत टेस्ट साइन इन करें'}</span>
-                </button>
-              </div>
-            </div>
-          </motion.div>
-        </div>
-      )}
-    </AnimatePresence>
-  );
-};
-
 const GuestBookModal = ({ 
   isOpen, 
   onClose, 
   lang,
-  user,
-  onSignInWithGitHub,
-  onSignOut,
-  onOpenOAuthGuide,
-  authLoading,
-  onDemoLogin
 }: { 
   isOpen: boolean; 
   onClose: () => void; 
   lang: 'en' | 'hi';
-  user: GitHubUser | null;
-  onSignInWithGitHub: () => void;
-  onSignOut: () => void;
-  onOpenOAuthGuide: () => void;
-  authLoading: boolean;
-  onDemoLogin: () => void;
 }) => {
   const [entries, setEntries] = useState<GuestBookEntry[]>([]);
   const [loadingEntries, setLoadingEntries] = useState(false);
   const [message, setMessage] = useState('');
   const [guestName, setGuestName] = useState('');
+  const [relation, setRelation] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitSuccess, setSubmitSuccess] = useState(false);
 
@@ -811,17 +474,13 @@ const GuestBookModal = ({
 
     try {
       setIsSubmitting(true);
-      const sessionToken = localStorage.getItem('wedding_session_token');
-      const headers: Record<string, string> = { 'Content-Type': 'application/json' };
-      if (sessionToken && sessionToken !== 'undefined' && sessionToken !== 'null') {
-        headers['x-session-token'] = sessionToken;
-      }
       const res = await fetch('/api/guestbook', {
         method: 'POST',
-        headers,
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           message: message.trim(),
-          name: guestName.trim() || undefined
+          name: guestName.trim() || undefined,
+          relation: relation.trim() || undefined
         })
       });
 
@@ -831,14 +490,24 @@ const GuestBookModal = ({
           setEntries(prev => [data.entry, ...prev]);
         }
         setMessage('');
+        setGuestName('');
+        setRelation('');
         setSubmitSuccess(true);
-        setTimeout(() => setSubmitSuccess(false), 3000);
+        setTimeout(() => setSubmitSuccess(false), 4000);
       }
     } catch (err) {
       console.error('Failed to post blessing:', err);
     } finally {
       setIsSubmitting(false);
     }
+  };
+
+  const getInitials = (name: string) => {
+    const parts = name.trim().split(/\s+/);
+    if (parts.length >= 2) {
+      return (parts[0][0] + parts[1][0]).toUpperCase();
+    }
+    return (name.trim()[0] || 'W').toUpperCase();
   };
 
   return (
@@ -874,6 +543,7 @@ const GuestBookModal = ({
               <button 
                 onClick={onClose} 
                 className="p-1.5 hover:bg-white/10 rounded-full transition-colors cursor-pointer"
+                aria-label="Close"
               >
                 <X size={22} />
               </button>
@@ -882,137 +552,96 @@ const GuestBookModal = ({
             {/* Content Container */}
             <div className="p-4 sm:p-6 overflow-y-auto space-y-6">
               
-              {/* User Auth Banner */}
-              {user ? (
-                <div className="bg-stone-900 text-stone-100 p-4 rounded-2xl flex items-center justify-between border border-wedding-gold/40 shadow-md">
-                  <div className="flex items-center gap-3">
-                    <img 
-                      src={user.avatar_url} 
-                      alt={user.login} 
-                      className="w-11 h-11 rounded-full border-2 border-wedding-gold shadow"
-                    />
-                    <div>
-                      <div className="flex items-center gap-1.5">
-                        <span className="font-bold text-sm text-wedding-gold">{user.name || user.login}</span>
-                        <ShieldCheck size={15} className="text-green-400" title="Verified GitHub Account" />
-                      </div>
-                      <p className="text-xs text-stone-400 flex items-center gap-1">
-                        <GitHubIcon className="w-3 h-3 text-stone-400" />
-                        <span>@{user.login}</span>
-                      </p>
-                    </div>
-                  </div>
-                  <button
-                    onClick={onSignOut}
-                    className="flex items-center gap-1 text-xs text-stone-400 hover:text-red-400 px-3 py-1.5 rounded-lg hover:bg-stone-800 transition-colors cursor-pointer"
-                  >
-                    <LogOut size={13} />
-                    <span>{lang === 'en' ? 'Sign Out' : 'लॉग आउट'}</span>
-                  </button>
-                </div>
-              ) : (
-                <div className="bg-white p-5 rounded-2xl border border-wedding-gold/30 shadow-md text-center space-y-3">
-                  <div className="w-10 h-10 bg-wedding-red/10 rounded-full flex items-center justify-center mx-auto text-wedding-red">
-                    <GitHubIcon className="w-5 h-5 text-wedding-red" />
-                  </div>
-                  <div>
-                    <h4 className="font-bold text-stone-800 text-base">
-                      {lang === 'en' ? 'Sign the Guest Book with GitHub' : 'गिटहब से साइन इन करके आशीर्वाद दें'}
-                    </h4>
-                    <p className="text-xs text-stone-500 mt-0.5">
-                      {lang === 'en' 
-                        ? 'Sign in with your GitHub identity to have your profile and verified badge attached to your blessings.'
-                        : 'अपने गिटहब प्रोफाइल से अपनी शुभकामनाएं एवं बधाई संदेश छोड़ें।'}
-                    </p>
-                  </div>
-                  
-                  <div className="flex flex-col sm:flex-row items-center justify-center gap-2.5 pt-1">
-                    <button
-                      onClick={onSignInWithGitHub}
-                      disabled={authLoading}
-                      className="w-full sm:w-auto flex items-center justify-center gap-2 bg-stone-900 hover:bg-black text-white px-4 py-2.5 rounded-xl font-bold text-xs shadow-md transition-all cursor-pointer disabled:opacity-50"
-                    >
-                      {authLoading ? (
-                        <Loader2 size={14} className="animate-spin text-wedding-gold" />
-                      ) : (
-                        <GitHubIcon className="w-4 h-4 text-white" />
-                      )}
-                      <span>{lang === 'en' ? 'Sign in with GitHub' : 'गिटहब से साइन इन करें'}</span>
-                    </button>
-
-                    <button
-                      onClick={onDemoLogin}
-                      className="w-full sm:w-auto flex items-center justify-center gap-1.5 bg-wedding-gold text-wedding-red px-4 py-2.5 rounded-xl font-bold text-xs shadow-md hover:bg-wedding-saffron transition-all cursor-pointer"
-                    >
-                      <Sparkles size={14} />
-                      <span>{lang === 'en' ? 'Quick Test Sign-In' : 'त्वरित टेस्ट लॉगिन'}</span>
-                    </button>
-                    
-                    <button
-                      onClick={onOpenOAuthGuide}
-                      className="text-xs text-wedding-red hover:underline flex items-center gap-1 cursor-pointer font-medium px-2 py-1"
-                    >
-                      <Info size={13} />
-                      <span>{lang === 'en' ? 'Setup Info' : 'सेटअप'}</span>
-                    </button>
-                  </div>
-                </div>
-              )}
+              {/* Introduction Banner */}
+              <div className="bg-white p-4 sm:p-5 rounded-2xl border border-wedding-gold/40 shadow-sm text-center space-y-1.5">
+                <p className="text-xs uppercase font-serif tracking-widest text-wedding-gold font-bold">
+                  || ॐ श्री गणेशाय नमः ||
+                </p>
+                <h4 className="font-bold text-wedding-red text-base sm:text-lg font-serif">
+                  {lang === 'en' ? 'Bless the Newlyweds' : 'वर-वधू को अपना आशीर्वाद दें'}
+                </h4>
+                <p className="text-xs text-stone-600 max-w-lg mx-auto leading-relaxed">
+                  {lang === 'en'
+                    ? 'Write your warm wishes, prayers and blessings directly into our wedding guestbook. Your words will remain cherished with us forever.'
+                    : 'हमारे विवाह के पावन अवसर पर अपने मंगल वचनों और शुभकामनाओं से हमें अनुगृहीत करें।'}
+                </p>
+              </div>
 
               {/* Write Blessing Form */}
-              <form onSubmit={handleSubmit} className="bg-white p-5 rounded-2xl border border-wedding-gold/30 shadow-md space-y-3">
+              <form onSubmit={handleSubmit} className="bg-white p-5 rounded-2xl border border-wedding-gold/30 shadow-md space-y-3.5">
                 <div className="flex items-center justify-between">
                   <label className="text-xs font-bold uppercase tracking-wider text-wedding-red flex items-center gap-1.5">
                     <Sparkles size={14} className="text-wedding-gold" />
-                    <span>{lang === 'en' ? 'Leave Your Blessing' : 'अपना आशीर्वाद व संदेश लिखें'}</span>
+                    <span>{lang === 'en' ? 'Write Your Blessing' : 'शुभकामनाएं व मंगल संदेश लिखें'}</span>
                   </label>
                   {submitSuccess && (
                     <span className="text-xs text-green-600 font-semibold flex items-center gap-1">
                       <CheckCircle2 size={13} />
-                      <span>{lang === 'en' ? 'Blessing published!' : 'संदेश पोस्ट हो गया!'}</span>
+                      <span>{lang === 'en' ? 'Blessing published with love!' : 'आपका संदेश सफलतापूर्वक जुड़ गया!'}</span>
                     </span>
                   )}
                 </div>
 
-                {!user && (
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div>
+                    <label className="block text-[11px] font-medium text-stone-600 mb-1">
+                      {lang === 'en' ? 'Your Name' : 'आपका नाम'} *
+                    </label>
                     <input
                       type="text"
-                      placeholder={lang === 'en' ? 'Your Name (optional)' : 'आपका नाम (वैकल्पिक)'}
+                      required
+                      placeholder={lang === 'en' ? 'e.g., Rajesh Sharma' : 'उदा. राजेश शर्मा'}
                       value={guestName}
                       onChange={(e) => setGuestName(e.target.value)}
-                      className="w-full px-3.5 py-2 text-xs border border-stone-200 rounded-xl focus:outline-none focus:border-wedding-gold focus:ring-1 focus:ring-wedding-gold"
+                      className="w-full px-3.5 py-2 text-xs sm:text-sm border border-stone-200 rounded-xl focus:outline-none focus:border-wedding-gold focus:ring-1 focus:ring-wedding-gold bg-stone-50/50"
                     />
                   </div>
-                )}
+                  <div>
+                    <label className="block text-[11px] font-medium text-stone-600 mb-1">
+                      {lang === 'en' ? 'Relation or City' : 'संबंध या शहर (वैकल्पिक)'}
+                    </label>
+                    <input
+                      type="text"
+                      placeholder={lang === 'en' ? 'e.g., College Friend, Patna' : 'उदा. कॉलेज मित्र, पटना'}
+                      value={relation}
+                      onChange={(e) => setRelation(e.target.value)}
+                      className="w-full px-3.5 py-2 text-xs sm:text-sm border border-stone-200 rounded-xl focus:outline-none focus:border-wedding-gold focus:ring-1 focus:ring-wedding-gold bg-stone-50/50"
+                    />
+                  </div>
+                </div>
 
-                <textarea
-                  rows={3}
-                  required
-                  placeholder={
-                    lang === 'en'
-                      ? 'Dear Shiv & Shwati, wishing you a happy married life filled with love, laughter, and joy!...'
-                      : 'प्रिय शिव और श्वाति, आपको वैवाहिक जीवन की हार्दिक बधाई और शुभकामनाएं!...'
-                  }
-                  value={message}
-                  onChange={(e) => setMessage(e.target.value)}
-                  className="w-full p-3.5 text-xs sm:text-sm border border-stone-200 rounded-xl focus:outline-none focus:border-wedding-gold focus:ring-1 focus:ring-wedding-gold resize-none leading-relaxed"
-                />
+                <div>
+                  <label className="block text-[11px] font-medium text-stone-600 mb-1">
+                    {lang === 'en' ? 'Your Message & Blessings' : 'आपका शुभकामना संदेश'} *
+                  </label>
+                  <textarea
+                    rows={3}
+                    required
+                    placeholder={
+                      lang === 'en'
+                        ? 'Dear Shiv & Shwati, wishing you a lifetime of love, laughter, and eternal togetherness!...'
+                        : 'प्रिय शिव और श्वाति, आपको वैवाहिक जीवन की हार्दिक बधाई और असीम मंगलकामनाएं!...'
+                    }
+                    value={message}
+                    onChange={(e) => setMessage(e.target.value)}
+                    className="w-full p-3.5 text-xs sm:text-sm border border-stone-200 rounded-xl focus:outline-none focus:border-wedding-gold focus:ring-1 focus:ring-wedding-gold resize-none leading-relaxed bg-stone-50/50"
+                  />
+                </div>
 
                 <div className="flex flex-col sm:flex-row items-center justify-between gap-3 pt-1">
                   <a
-                    href="https://wa.me/917665607016?text=Dear%20Shiv%20and%20Shwati,%20here%20is%20my%20blessing:%20"
+                    href="https://wa.me/917665607016?text=Dear%20Shiv%20and%20Shwati,%20here%20is%20my%20wedding%20blessing:%20"
                     target="_blank"
                     rel="noreferrer"
                     className="text-xs text-green-600 hover:text-green-700 font-semibold flex items-center gap-1.5 order-2 sm:order-1"
                   >
                     <MessageCircle size={15} />
-                    <span>{lang === 'en' ? 'Or send directly on WhatsApp' : 'या सीधे व्हाट्सएप पर भेजें'}</span>
+                    <span>{lang === 'en' ? 'Or send directly via WhatsApp' : 'या सीधे व्हाट्सएप पर भेजें'}</span>
                   </a>
 
                   <button
                     type="submit"
-                    disabled={isSubmitting || !message.trim()}
+                    disabled={isSubmitting || !message.trim() || !guestName.trim()}
                     className="w-full sm:w-auto order-1 sm:order-2 flex items-center justify-center gap-2 bg-wedding-red text-wedding-cream px-6 py-2.5 rounded-xl font-bold text-xs hover:bg-wedding-red/90 transition-all shadow-md cursor-pointer disabled:opacity-50"
                   >
                     {isSubmitting ? (
@@ -1020,16 +649,19 @@ const GuestBookModal = ({
                     ) : (
                       <Send size={14} />
                     )}
-                    <span>{lang === 'en' ? 'Send Blessing' : 'आशीर्वाद भेजें'}</span>
+                    <span>{lang === 'en' ? 'Send Blessings' : 'आशीर्वाद प्रेषित करें'}</span>
                   </button>
                 </div>
               </form>
 
               {/* List of Blessings */}
               <div className="space-y-3">
-                <h4 className="text-xs font-bold uppercase tracking-wider text-stone-500">
-                  {lang === 'en' ? `Recent Blessings (${entries.length})` : `शुभकामनाएं व आशीर्वाद (${entries.length})`}
-                </h4>
+                <div className="flex items-center justify-between">
+                  <h4 className="text-xs font-bold uppercase tracking-wider text-stone-500">
+                    {lang === 'en' ? `Guest Blessings (${entries.length})` : `अतिथियों के आशीर्वाद संदेश (${entries.length})`}
+                  </h4>
+                  <span className="text-[11px] text-wedding-gold font-serif">|| सदा सुहागन रहो ||</span>
+                </div>
 
                 {loadingEntries ? (
                   <div className="text-center py-8">
@@ -1046,28 +678,30 @@ const GuestBookModal = ({
                         key={entry.id}
                         initial={{ opacity: 0, y: 10 }}
                         animate={{ opacity: 1, y: 0 }}
-                        className="bg-white p-4 rounded-2xl border border-wedding-gold/20 shadow-sm space-y-2"
+                        className="bg-white p-4 rounded-2xl border border-wedding-gold/25 shadow-sm space-y-2 hover:border-wedding-gold/50 transition-colors"
                       >
                         <div className="flex items-center justify-between">
                           <div className="flex items-center gap-2.5">
-                            <img
-                              src={entry.avatarUrl || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&q=80&w=150'}
-                              alt={entry.name}
-                              className="w-8 h-8 rounded-full object-cover border border-wedding-gold/40"
-                            />
+                            {entry.avatarUrl ? (
+                              <img
+                                src={entry.avatarUrl}
+                                alt={entry.name}
+                                className="w-9 h-9 rounded-full object-cover border border-wedding-gold/40 shadow-sm"
+                              />
+                            ) : (
+                              <div className="w-9 h-9 rounded-full bg-wedding-red text-wedding-cream flex items-center justify-center font-bold text-xs border border-wedding-gold/40 shadow-sm">
+                                {getInitials(entry.name)}
+                              </div>
+                            )}
                             <div>
-                              <div className="flex items-center gap-1.5">
-                                <span className="font-bold text-xs text-stone-800">{entry.name}</span>
-                                {entry.isGitHubVerified && (
-                                  <span className="inline-flex items-center gap-1 bg-stone-100 text-stone-700 px-1.5 py-0.5 rounded text-[10px] font-mono border border-stone-200">
-                                    <GitHubIcon className="w-2.5 h-2.5" />
-                                    <span>verified</span>
+                              <div className="flex items-center gap-2">
+                                <span className="font-bold text-xs sm:text-sm text-stone-800">{entry.name}</span>
+                                {entry.relation && (
+                                  <span className="text-[10px] text-wedding-red font-medium bg-wedding-red/10 px-2 py-0.5 rounded-full border border-wedding-gold/20">
+                                    {entry.relation}
                                   </span>
                                 )}
                               </div>
-                              {entry.handle && (
-                                <p className="text-[10px] text-stone-400 font-mono">@{entry.handle}</p>
-                              )}
                             </div>
                           </div>
                           <span className="text-[10px] text-stone-400">
@@ -1077,7 +711,7 @@ const GuestBookModal = ({
                             })}
                           </span>
                         </div>
-                        <p className="text-xs sm:text-sm text-stone-700 leading-relaxed pl-10">
+                        <p className="text-xs sm:text-sm text-stone-700 leading-relaxed pl-11">
                           {entry.message}
                         </p>
                       </motion.div>
@@ -1096,13 +730,8 @@ const GuestBookModal = ({
 
 export default function App() {
   const [isGuestBookOpen, setIsGuestBookOpen] = useState(false);
-  const [isOAuthGuideOpen, setIsOAuthGuideOpen] = useState(false);
   const [lang, setLang] = useState<'en' | 'hi'>('hi'); // Default to Hindi as per theme
   const [showLangPopup, setShowLangPopup] = useState(true);
-  
-  // Auth state
-  const [user, setUser] = useState<GitHubUser | null>(null);
-  const [authLoading, setAuthLoading] = useState(false);
   const [toast, setToast] = useState<{ type: 'success' | 'error' | 'info'; message: string } | null>(null);
 
   const showToast = (type: 'success' | 'error' | 'info', message: string) => {
@@ -1110,141 +739,6 @@ export default function App() {
     setTimeout(() => {
       setToast(null);
     }, 4500);
-  };
-
-  // Restore session from localStorage & verify with server on mount
-  useEffect(() => {
-    const savedUser = localStorage.getItem('wedding_gh_user');
-    if (savedUser) {
-      try {
-        setUser(JSON.parse(savedUser));
-      } catch (e) {
-        // ignore
-      }
-    }
-
-    const checkSession = async () => {
-      try {
-        const token = localStorage.getItem('wedding_session_token');
-        const headers: Record<string, string> = {};
-        if (token && token !== 'undefined' && token !== 'null') {
-          headers['x-session-token'] = token;
-        }
-        const res = await fetch('/api/auth/me', { headers });
-        if (res.ok) {
-          const data = await res.json();
-          if (data.authenticated && data.user) {
-            setUser(data.user);
-            localStorage.setItem('wedding_gh_user', JSON.stringify(data.user));
-          }
-        }
-      } catch (err) {
-        console.error('Session check error:', err);
-      }
-    };
-
-    checkSession();
-  }, []);
-
-  // Listen for OAuth postMessage events from popup
-  useEffect(() => {
-    const handleMessage = (event: MessageEvent) => {
-      const origin = event.origin;
-      // Allow only preview domain or localhost
-      if (!origin.endsWith('.run.app') && !origin.includes('localhost') && !origin.includes('127.0.0.1')) {
-        return;
-      }
-
-      if (event.data?.type === 'OAUTH_AUTH_SUCCESS') {
-        const loggedUser = event.data.user;
-        if (loggedUser) {
-          setUser(loggedUser);
-          localStorage.setItem('wedding_gh_user', JSON.stringify(loggedUser));
-        }
-        if (event.data.sessionToken) {
-          localStorage.setItem('wedding_session_token', event.data.sessionToken);
-        }
-        showToast('success', `Signed in successfully as @${loggedUser?.login || 'user'}!`);
-      } else if (event.data?.type === 'OAUTH_AUTH_ERROR') {
-        showToast('error', event.data.error || 'GitHub authentication could not be completed.');
-        setIsOAuthGuideOpen(true);
-      }
-    };
-
-    window.addEventListener('message', handleMessage);
-    return () => window.removeEventListener('message', handleMessage);
-  }, []);
-
-  // Trigger popup OAuth flow
-  const handleSignInWithGitHub = async () => {
-    setAuthLoading(true);
-    try {
-      const res = await fetch('/api/auth/github/url');
-      const data = await res.json();
-
-      if (!data.configured || !data.url) {
-        // OAuth app not configured in environment yet
-        setIsOAuthGuideOpen(true);
-        showToast('info', lang === 'hi' ? 'गिटहब ऐप सेटअप आवश्यक है या नीचे त्वरित टेस्ट लॉगिन चुनें' : 'GitHub OAuth setup needed or choose Quick Test Sign-In');
-        return;
-      }
-
-      // Open OAuth provider URL directly in popup (never container route)
-      const width = 600;
-      const height = 700;
-      const left = window.screenX + (window.outerWidth - width) / 2;
-      const top = window.screenY + (window.outerHeight - height) / 2;
-      
-      const authWindow = window.open(
-        data.url,
-        'github_oauth_popup',
-        `width=${width},height=${height},left=${left},top=${top},status=yes,scrollbars=yes`
-      );
-
-      if (!authWindow) {
-        showToast('error', lang === 'hi' ? 'पॉपअप ब्लॉक हो गया है। कृपया ब्राउज़र में पॉपअप की अनुमति दें।' : 'Popup was blocked. Please allow popups for this site to sign in with GitHub.');
-      }
-    } catch (err: any) {
-      console.error('Error starting GitHub OAuth:', err);
-      setIsOAuthGuideOpen(true);
-      showToast('error', 'Unable to initiate GitHub login. Check setup guide.');
-    } finally {
-      setAuthLoading(false);
-    }
-  };
-
-  const handleSignOut = async () => {
-    try {
-      const token = localStorage.getItem('wedding_session_token');
-      const headers: Record<string, string> = {};
-      if (token && token !== 'undefined' && token !== 'null') {
-        headers['x-session-token'] = token;
-      }
-      await fetch('/api/auth/logout', {
-        method: 'POST',
-        headers
-      });
-    } catch (err) {
-      console.error('Logout error:', err);
-    } finally {
-      setUser(null);
-      localStorage.removeItem('wedding_gh_user');
-      localStorage.removeItem('wedding_session_token');
-      showToast('info', 'Signed out successfully.');
-    }
-  };
-
-  const handleDemoLogin = () => {
-    const demoUser: GitHubUser = {
-      id: 999999,
-      login: 'wedding-guest',
-      name: 'Guest Developer',
-      avatar_url: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=150',
-      html_url: 'https://github.com',
-    };
-    setUser(demoUser);
-    localStorage.setItem('wedding_gh_user', JSON.stringify(demoUser));
-    showToast('success', 'Signed in as Guest Developer! You can now sign the guest book.');
   };
 
   return (
@@ -1332,11 +826,6 @@ export default function App() {
         onOpenGuestBook={() => setIsGuestBookOpen(true)} 
         lang={lang} 
         setLang={setLang}
-        user={user}
-        onSignInWithGitHub={handleSignInWithGitHub}
-        onSignOut={handleSignOut}
-        onOpenOAuthGuide={() => setIsOAuthGuideOpen(true)}
-        authLoading={authLoading}
       />
       
       <main>
@@ -1413,15 +902,6 @@ export default function App() {
               <MessageCircle size={24} />
             </a>
           </div>
-          <div className="flex items-center justify-center gap-4 text-xs text-stone-500 mb-4">
-            <button
-              onClick={() => setIsOAuthGuideOpen(true)}
-              className="hover:text-wedding-gold transition-colors flex items-center gap-1 cursor-pointer"
-            >
-              <GitHubIcon className="w-3.5 h-3.5" />
-              <span>GitHub OAuth Configuration</span>
-            </button>
-          </div>
           <p className="text-sm opacity-50">© 2026 Wedding Invitation. Made with Love.</p>
         </div>
       </footer>
@@ -1430,21 +910,9 @@ export default function App() {
         isOpen={isGuestBookOpen} 
         onClose={() => setIsGuestBookOpen(false)} 
         lang={lang} 
-        user={user}
-        onSignInWithGitHub={handleSignInWithGitHub}
-        onSignOut={handleSignOut}
-        onOpenOAuthGuide={() => setIsOAuthGuideOpen(true)}
-        authLoading={authLoading}
-        onDemoLogin={handleDemoLogin}
-      />
-
-      <OAuthSetupModal
-        isOpen={isOAuthGuideOpen}
-        onClose={() => setIsOAuthGuideOpen(false)}
-        lang={lang}
-        onDemoLogin={handleDemoLogin}
       />
     </div>
   );
 }
+
 
